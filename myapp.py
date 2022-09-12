@@ -1,9 +1,10 @@
+from time import time
 from flask import Flask, jsonify
 import requests, json, datetime
 app = Flask(__name__)
 
 token = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyMzhRS0QiLCJzdWIiOiJCNEYzNVEiLCJpc3MiOiJGaXRiaXQiLCJ0eXAiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZXMiOiJyc29jIHJzZXQgcm94eSBycHJvIHJudXQgcnNsZSByYWN0IHJsb2MgcnJlcyByd2VpIHJociBydGVtIiwiZXhwIjoxNjkxMDQxNzA4LCJpYXQiOjE2NTk1MDU3MDh9.NzxJB3FZxmWDyJx44pvUZOCkqME50heLRhYWD19z1go"
-ptoken = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyMzhSTUIiLCJzdWIiOiJCNEYzNVEiLCJpc3MiOiJGaXRiaXQiLCJ0eXAiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZXMiOiJyc29jIHJzZXQgcm94eSBycHJvIHJudXQgcnNsZSByYWN0IHJyZXMgcmxvYyByd2VpIHJociBydGVtIiwiZXhwIjoxNjkyMjk2MDE4LCJpYXQiOjE2NjA3NjAwMTh9.Ud4qSIXGglbXaYeK-JDzL9GolEskKk9aCGrl79NMDY4"
+ptoken = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyMzhRUEYiLCJzdWIiOiJCNEYzNVEiLCJpc3MiOiJGaXRiaXQiLCJ0eXAiOiJhY2Nlc3NfdG9rZW4iLCJzY29wZXMiOiJyc29jIHJzZXQgcm94eSBycHJvIHJudXQgcnNsZSByYWN0IHJyZXMgcmxvYyByd2VpIHJociBydGVtIiwiZXhwIjoxNjkyMzIyMTc4LCJpYXQiOjE2NjA3ODYxNzh9.t4-tjP-pBKe-wdbYLTL9t-h7wAOWsAlu-cGurSkfJiU"
 myheader = {'Accept' : 'application/json', 'Authorization' : 'Bearer {}'.format(token)}
 myPheader = {'Accept' : 'application/json', 'Authorization' : 'Bearer {}'.format(ptoken)}
 
@@ -25,12 +26,13 @@ def get_last_heartrate():
     heart_rate = heartresp['activities-heart-intraday']['dataset'][-1]['value']
     time_taken = heartresp['activities-heart-intraday']['dataset'][-1]['time']
     current_time = datetime.datetime.strptime(datetime.datetime.now().strftime("%H:%M:%S"), "%H:%M:%S")
+    time_adjust = datetime.timedelta(0,4,0)
     time_offset = current_time - datetime.datetime.strptime(time_taken, '%H:%M:%S')
-    str_time_offset:str = str(time_offset)
+    time_offset_timezone = time_offset - time_adjust
+    str_time_offset:str = str(time_offset_timezone)
 
     retStr = {'Heartrate': heart_rate, 'time-offset':str_time_offset}
     return jsonify(retStr)
-
 
 stepsurl = "https://api.fitbit.com/1/user/-/activities/steps/date/today/1d.json"
 stepstimeurl = "https://api.fitbit.com/1/user/-/activities/steps/date/today/1d/1min.json"
@@ -42,7 +44,7 @@ def get_last_steps():
     current_time = datetime.datetime.strptime(datetime.datetime.now().strftime("%H:%M:%S"), "%H:%M:%S")
     last_steps_time = datetime.datetime.strptime(stepstimeresp["activities-steps-intraday"]["dataset"][-1]["time"], "%H:%M:%S")
     time_offset = current_time - last_steps_time
-    str_time_offset:str = str(time_offset)
+    str_time_offset:str = str(time_offset - datetime.timedelta(0,4,0))
 
     retStr = {'steps': steps, 'time-offset': str_time_offset}
     return jsonify(retStr)
