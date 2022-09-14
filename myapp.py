@@ -26,7 +26,7 @@ def get_last_heartrate():
     heart_rate = heartresp['activities-heart-intraday']['dataset'][-1]['value']
     time_taken = heartresp['activities-heart-intraday']['dataset'][-1]['time']
     current_time = datetime.datetime.strptime(datetime.datetime.now().strftime("%H:%M:%S"), "%H:%M:%S")
-    time_adjust = datetime.timedelta(0,4,0)
+    time_adjust = datetime.timedelta(0,14400,0)
     time_offset = current_time - datetime.datetime.strptime(time_taken, '%H:%M:%S')
     time_offset_timezone = time_offset - time_adjust
     str_time_offset:str = str(time_offset_timezone)
@@ -44,7 +44,7 @@ def get_last_steps():
     current_time = datetime.datetime.strptime(datetime.datetime.now().strftime("%H:%M:%S"), "%H:%M:%S")
     last_steps_time = datetime.datetime.strptime(stepstimeresp["activities-steps-intraday"]["dataset"][-1]["time"], "%H:%M:%S")
     time_offset = current_time - last_steps_time
-    str_time_offset:str = str(time_offset - datetime.timedelta(0,4,0))
+    str_time_offset:str = str(time_offset - datetime.timedelta(0,14400,0))
 
     retStr = {'steps': steps, 'time-offset': str_time_offset}
     return jsonify(retStr)
